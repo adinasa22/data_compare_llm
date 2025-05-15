@@ -1,0 +1,5 @@
+pandas
+streamlit
+fuzzywuzzy
+openpyxl
+ollama
