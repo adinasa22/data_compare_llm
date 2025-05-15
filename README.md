@@ -50,12 +50,6 @@ compare_files_app/
 streamlit run app.py
 ```
 
-## 🔧 To Do
-
-- Add logic for each operation (currently just UI placeholders).
-- Add download/export options for result dataframes.
-- Enhance fuzzy matching with adjustable thresholds.
-
 ## 🙌 Acknowledgments
 
 - [Streamlit](https://streamlit.io/)
