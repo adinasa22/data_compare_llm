@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from fuzzywuzzy import fuzz
 
 st.set_page_config(page_title="Compare Two Files", layout="wide")
@@ -136,18 +137,15 @@ if file1 and file2:
                 differences = {}
 
                 for col in row1.index:
-                    if pd.isna(row1[col]) or pd.isna(row2[col]):
-                        continue
                     if isinstance(row1[col], str) and isinstance(row2[col], str):
                         score = fuzz.ratio(row1[col], row2[col])
                         if score < text_threshold:
-                            #differences[col] = (row1[col], row2[col], score)
-                            differences[col] = f"Mismatch: {row1[col]} vs {row2[col]}. Similarity Score: {score}"
-                    elif isinstance(row1[col], (int, float)) and isinstance(row2[col], (int, float)):
+                            differences[col] = f"Mismatch in column: {col} - {row1[col]} vs {row2[col]}. Similarity Score: {score}"
+                    elif isinstance(row1[col], np.int64) and isinstance(row2[col], np.int64):
                         score = abs(row1[col] - row2[col])
                         if score > numeric_threshold:
-                            #differences[col] = (row1[col], row2[col])
-                            differences[col] = f"Mismatch: {row1[col]} vs {row2[col]}. Similarity Score: {score}"
+                            differences[col] = f"Mismatch in column: {col} - {row1[col]} vs {row2[col]}. Similarity Score: {score}"
+
 
                 return differences if differences else None
 
