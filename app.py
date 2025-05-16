@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 
 st.set_page_config(page_title="Compare Two Files", layout="wide")
 
-st.title("📊 Upload and Compare Two Excel/CSV Files")
+st.title("📊 Upload and Compare Two Excel/CSV Files using local LLM Ollama")
 
 # Upload files
 st.sidebar.header("Upload Files")
@@ -137,11 +137,12 @@ if file1 and file2:
                 differences = {}
 
                 for col in row1.index:
+                    print(col, type(row1[col]), type(row2[col]))  # Debug line
                     if isinstance(row1[col], str) and isinstance(row2[col], str):
                         score = fuzz.ratio(row1[col], row2[col])
                         if score < text_threshold:
                             differences[col] = f"Mismatch in column: {col} - {row1[col]} vs {row2[col]}. Similarity Score: {score}"
-                    elif isinstance(row1[col], np.int64) and isinstance(row2[col], np.int64):
+                    elif isinstance(row1[col], (int, float, np.int64, np.float64)) and isinstance(row2[col], (int, float, np.int64, np.float64)):
                         score = abs(row1[col] - row2[col])
                         if score > numeric_threshold:
                             differences[col] = f"Mismatch in column: {col} - {row1[col]} vs {row2[col]}. Similarity Score: {score}"
@@ -152,10 +153,12 @@ if file1 and file2:
             mismatch_summaries = []
 
             for _, row_a in df1.iterrows():
-                row_b = df2[df2[join_col] == row_a[join_col]].iloc[0]
-                summary = summarize_mismatches(row_a, row_b)
-                if summary:
-                    mismatch_summaries.append({join_col: row_a[join_col], "Summary": summary})
+                matches = df2[df2[join_col] == row_a[join_col]]
+                if not matches.empty:
+                    row_b = matches.iloc[0]
+                    summary = summarize_mismatches(row_a, row_b)
+                    if summary:
+                        mismatch_summaries.append({join_col: row_a[join_col], "Summary": summary})
 
 
             st.subheader("❌ Similar Rows")
@@ -213,10 +216,6 @@ if file1 and file2:
 
             else:
                 st.warning("Analysis using local LLM is skipped.")
-
-
-
-
 
         else:
             st.warning("No common columns found for non-matching row comparison.")
